@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var avatar = r.avatarUrl
         ? '<img src="' + esc(r.avatarUrl) + '" alt="" class="review-avatar-img" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="review-avatar" style="display:none">' + esc(r.initials || '') + '</div>'
         : '<div class="review-avatar">' + esc(r.initials || '') + '</div>';
-      return '<div class="review-card animate"><p class="review-text">"' + text + '"</p><div class="review-author">' + avatar + '<div class="review-meta"><strong>' + esc(r.name || '') + '</strong><span>' + esc(r.date || '') + ' &bull; Facebook</span></div></div></div>';
+      return '<div class="review-card"><p class="review-text">"' + text + '"</p><div class="review-author">' + avatar + '<div class="review-meta"><strong>' + esc(r.name || '') + '</strong><span>' + esc(r.date || '') + ' &bull; Facebook</span></div></div></div>';
     }
     var html = reviews.map(cardHtml).join('');
     reviewsTrack.innerHTML = html + html;
@@ -360,22 +360,6 @@ document.addEventListener('DOMContentLoaded', function () {
       stickyCta.style.opacity = footerTop < window.innerHeight ? '0' : '1';
       stickyCta.style.pointerEvents = footerTop < window.innerHeight ? 'none' : 'auto';
     }, { passive: true });
-  }
-
-  // --- Google Calendar embed (event request page) ---
-  var calendarEmbed = document.getElementById('calendarEmbed');
-  if (calendarEmbed && typeof PEACE_PIZZA_CONFIG !== 'undefined' && PEACE_PIZZA_CONFIG.googleCalendarId) {
-    var enc = encodeURIComponent(PEACE_PIZZA_CONFIG.googleCalendarId);
-    var iframe = document.createElement('iframe');
-    iframe.src = 'https://calendar.google.com/calendar/embed?height=400&wkst=1&bgcolor=%23ffffff&ctz=America%2FNew_York&src=' + enc + '&color=%23d62828&mode=MONTH&showTitle=0&showPrint=0&showTz=0';
-    iframe.style.cssText = 'border:0; width:100%; max-width:800px; height:400px; margin:0 auto; display:block; border-radius:12px;';
-    iframe.title = 'Peace Pizza Availability';
-    calendarEmbed.innerHTML = '';
-    calendarEmbed.appendChild(iframe);
-    var p = document.createElement('p');
-    p.style.cssText = 'font-size:.85rem; color:var(--gray-mid); margin-top:12px; text-align:center;';
-    p.textContent = 'Empty = available. Have a date in mind? Request it below.';
-    calendarEmbed.appendChild(p);
   }
 
   // --- Newsletter form ---
