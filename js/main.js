@@ -3,9 +3,6 @@
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', function () {
-  // #region agent log
-  fetch('http://127.0.0.1:7247/ingest/0da2f121-1691-4fb2-9ef4-14a2d878b788',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:init',message:'DOMContentLoaded fired',data:{page:window.location.href.substring(0,100),socialImgCount:document.querySelectorAll('.social-link img').length,socialSvgCount:document.querySelectorAll('.social-link svg').length,modalPresent:!!document.getElementById('bookingModal'),openBtnCount:document.querySelectorAll('.js-open-booking-modal').length},timestamp:Date.now(),hypothesisId:'A,B'})}).catch(function(){});
-  // #endregion
 
   var formspreeUrl = (typeof PEACE_PIZZA_CONFIG !== 'undefined' && PEACE_PIZZA_CONFIG.formspreeEndpoint && PEACE_PIZZA_CONFIG.formspreeEndpoint !== 'YOUR_FORM_ID')
     ? 'https://formspree.io/f/' + PEACE_PIZZA_CONFIG.formspreeEndpoint
@@ -266,8 +263,43 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // Apply form
+  var applyForm = document.getElementById('applyForm');
+  if (applyForm) {
+    applyForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var valid = true;
+      applyForm.querySelectorAll('[required]').forEach(function (input) {
+        if (!input.value.trim()) { input.style.borderColor = '#d62828'; valid = false; }
+        else { input.style.borderColor = '#e0e0e0'; }
+      });
+      if (!valid) return;
+      var btn = applyForm.querySelector('button[type="submit"]');
+      var originalText = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+      var successEl = document.getElementById('formSuccess');
+      if (formspreeUrl) {
+        var fd = new FormData(applyForm);
+        fd.set('_subject', 'Peace Pizza - Job Application');
+        fetch(formspreeUrl, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data.ok) {
+              applyForm.style.display = 'none';
+              if (successEl) { successEl.classList.add('show'); successEl.style.display = 'block'; }
+            } else { alert('Something went wrong. Please email max@peacewoodfiredpizza.com'); }
+          })
+          .catch(function () { alert('Network error. Please try again.'); })
+          .finally(function () { if (btn) { btn.disabled = false; btn.textContent = originalText; } });
+      } else {
+        applyForm.style.display = 'none';
+        if (successEl) { successEl.classList.add('show'); successEl.style.display = 'block'; }
+      }
+    });
+  }
+
   // Other forms (newsletter, etc.) - simple handler
-  var otherForms = document.querySelectorAll('form:not(#eventForm):not(#bookingModalForm):not(.js-page-cta-form)');
+  var otherForms = document.querySelectorAll('form:not(#eventForm):not(#bookingModalForm):not(.js-page-cta-form):not(#applyForm)');
   otherForms.forEach(function (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -391,9 +423,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (footerLocationLinks) {
     var locationPages = [{"label":"Indian Hill Catering","url":"locations/indian-hill-catering.html"},{"label":"Blue Ash Catering","url":"locations/blue-ash-catering.html"},{"label":"Mason Catering","url":"locations/mason-catering.html"},{"label":"Hyde Park Catering","url":"locations/hyde-park-catering.html"},{"label":"Montgomery Catering","url":"locations/montgomery-catering.html"},{"label":"Wyoming Catering","url":"locations/wyoming-catering.html"},{"label":"Mariemont Catering","url":"locations/mariemont-catering.html"},{"label":"Mt. Lookout Catering","url":"locations/mt-lookout-catering.html"},{"label":"West Chester Catering","url":"locations/west-chester-catering.html"},{"label":"Madeira Catering","url":"locations/madeira-catering.html"},{"label":"Terrace Park Catering","url":"locations/terrace-park-catering.html"},{"label":"Oakley Catering","url":"locations/oakley-catering.html"},{"label":"OTR Catering","url":"locations/otr-catering.html"},{"label":"Kenwood Catering","url":"locations/kenwood-catering.html"},{"label":"Clifton Catering","url":"locations/clifton-catering.html"}];
     var base = (window.location.pathname || '').indexOf('pages/') !== -1 || (window.location.pathname || '').indexOf('locations/') !== -1 ? '../' : '';
-    // #region agent log
-    fetch('http://127.0.0.1:7247/ingest/0da2f121-1691-4fb2-9ef4-14a2d878b788',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'main.js:footerLinks',message:'footer location base path',data:{pathname:window.location.pathname,base:base,protocol:window.location.protocol,href:window.location.href.substring(0,80)},timestamp:Date.now(),hypothesisId:'C'})}).catch(function(){});
-    // #endregion
     var html = locationPages.map(function (p) {
       return '<li><a href="' + base + p.url + '">' + String(p.label).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') + '</a></li>';
     }).join('');
