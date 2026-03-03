@@ -4,9 +4,22 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  var formspreeUrl = (typeof PEACE_PIZZA_CONFIG !== 'undefined' && PEACE_PIZZA_CONFIG.formspreeEndpoint && PEACE_PIZZA_CONFIG.formspreeEndpoint !== 'YOUR_FORM_ID')
-    ? 'https://formspree.io/f/' + PEACE_PIZZA_CONFIG.formspreeEndpoint
+  var w3fKey = (typeof PEACE_PIZZA_CONFIG !== 'undefined' && PEACE_PIZZA_CONFIG.web3formsKey && PEACE_PIZZA_CONFIG.web3formsKey !== 'YOUR_WEB3FORMS_KEY')
+    ? PEACE_PIZZA_CONFIG.web3formsKey
     : null;
+  var w3fUrl = 'https://api.web3forms.com/submit';
+
+  function submitForm(fd, successCb, errorCb, finallyCb) {
+    fd.set('access_key', w3fKey);
+    fetch(w3fUrl, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) { successCb(); }
+        else { errorCb(data.message || 'Something went wrong.'); }
+      })
+      .catch(function () { errorCb('Network error. Please call (513) 222-4087.'); })
+      .finally(finallyCb);
+  }
 
   // --- Header scroll effect ---
   const header = document.getElementById('header');
@@ -95,21 +108,19 @@ document.addEventListener('DOMContentLoaded', function () {
       var btn = bookingForm.querySelector('button[type="submit"]');
       var originalText = btn ? btn.textContent : '';
       if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
-      if (formspreeUrl) {
+      if (w3fKey) {
         var fd = new FormData(bookingForm);
-        fd.set('_subject', 'Peace Pizza - Quick Booking Request');
-        fetch(formspreeUrl, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
-          .then(function (r) { return r.json(); })
-          .then(function (data) {
-            if (data.ok) {
-              bookingForm.style.display = 'none';
-              bookingSuccess.classList.add('show');
-              bookingSuccess.style.display = 'block';
-              setTimeout(closeModal, 2000);
-            } else { alert('Something went wrong. Please call (513) 222-4087.'); }
-          })
-          .catch(function () { alert('Network error. Please call (513) 222-4087.'); })
-          .finally(function () { if (btn) { btn.disabled = false; btn.textContent = originalText; } });
+        fd.set('subject', 'Peace Pizza - Quick Booking Request');
+        submitForm(fd,
+          function () {
+            bookingForm.style.display = 'none';
+            bookingSuccess.classList.add('show');
+            bookingSuccess.style.display = 'block';
+            setTimeout(closeModal, 2000);
+          },
+          function (msg) { alert(msg + ' Please call (513) 222-4087.'); },
+          function () { if (btn) { btn.disabled = false; btn.textContent = originalText; } }
+        );
       } else {
         bookingForm.style.display = 'none';
         bookingSuccess.classList.add('show');
@@ -172,37 +183,23 @@ document.addEventListener('DOMContentLoaded', function () {
     animateEls.forEach(function (el) { observer.observe(el); });
   }
 
-  // --- Set form actions from config (for no-JS fallback) ---
-  if (formspreeUrl) {
-    var ef = document.getElementById('eventForm');
-    if (ef) ef.setAttribute('action', formspreeUrl);
-    document.querySelectorAll('.js-page-cta-form').forEach(function (f) {
-      f.setAttribute('action', formspreeUrl);
-    });
-  }
-
   // --- Form handling ---
-  function submitToFormspree(form, successEl, btn, originalText) {
-    if (!formspreeUrl) {
-      alert('Form not configured. Add your Formspree ID in js/config.js');
+  function submitToWeb3Forms(form, successEl, btn, originalText, subject) {
+    if (!w3fKey) {
+      alert('Form not configured. Add your Web3Forms key in js/config.js');
       if (btn) { btn.disabled = false; btn.textContent = originalText; }
       return;
     }
-    var formData = new FormData(form);
-    fetch(formspreeUrl, { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } })
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        if (data.ok) {
-          form.style.display = 'none';
-          if (successEl) { successEl.classList.add('show'); successEl.style.display = 'block'; }
-        } else {
-          alert('Something went wrong. Please email max@peacewoodfiredpizza.com');
-        }
-      })
-      .catch(function () { alert('Network error. Please try again or call (513) 222-4087.'); })
-      .finally(function () {
-        if (btn) { btn.disabled = false; btn.textContent = originalText; }
-      });
+    var fd = new FormData(form);
+    if (subject) fd.set('subject', subject);
+    submitForm(fd,
+      function () {
+        form.style.display = 'none';
+        if (successEl) { successEl.classList.add('show'); successEl.style.display = 'block'; }
+      },
+      function () { alert('Something went wrong. Please email max@peacewoodfiredpizza.com'); },
+      function () { if (btn) { btn.disabled = false; btn.textContent = originalText; } }
+    );
   }
 
   // Event request form
@@ -219,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       if (!valid) return;
       if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
-      submitToFormspree(eventForm, document.getElementById('formSuccess'), btn, originalText);
+      submitToWeb3Forms(eventForm, document.getElementById('formSuccess'), btn, originalText, 'Peace Pizza - Event Request');
     });
   }
 
@@ -239,27 +236,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var wrap = form.closest('.page-cta-form-wrap');
       var successEl = wrap ? wrap.querySelector('.page-cta-success') : null;
       if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
-      if (!formspreeUrl) {
-        form.style.display = 'none';
-        if (successEl) { successEl.classList.add('show'); successEl.style.display = 'block'; }
-        if (btn) { btn.disabled = false; btn.textContent = originalText; }
-        return;
-      }
-      var formData = new FormData(form);
-      fetch(formspreeUrl, { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          if (data.ok) {
-            form.style.display = 'none';
-            if (successEl) { successEl.classList.add('show'); successEl.style.display = 'block'; }
-          } else {
-            alert('Something went wrong. Please call (513) 222-4087.');
-          }
-        })
-        .catch(function () { alert('Network error. Please try again or call (513) 222-4087.'); })
-        .finally(function () {
-          if (btn) { btn.disabled = false; btn.textContent = originalText; }
-        });
+      submitToWeb3Forms(form, successEl, btn, originalText, 'Peace Pizza - Booking Request');
     });
   });
 
@@ -278,23 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var originalText = btn ? btn.textContent : '';
       if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
       var successEl = document.getElementById('formSuccess');
-      if (formspreeUrl) {
-        var fd = new FormData(applyForm);
-        fd.set('_subject', 'Peace Pizza - Job Application');
-        fetch(formspreeUrl, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
-          .then(function (r) { return r.json(); })
-          .then(function (data) {
-            if (data.ok) {
-              applyForm.style.display = 'none';
-              if (successEl) { successEl.classList.add('show'); successEl.style.display = 'block'; }
-            } else { alert('Something went wrong. Please email max@peacewoodfiredpizza.com'); }
-          })
-          .catch(function () { alert('Network error. Please try again.'); })
-          .finally(function () { if (btn) { btn.disabled = false; btn.textContent = originalText; } });
-      } else {
-        applyForm.style.display = 'none';
-        if (successEl) { successEl.classList.add('show'); successEl.style.display = 'block'; }
-      }
+      submitToWeb3Forms(applyForm, successEl, btn, originalText, 'Peace Pizza - Job Application');
     });
   }
 

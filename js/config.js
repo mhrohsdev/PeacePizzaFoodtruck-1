@@ -1,10 +1,9 @@
 /**
  * Peace Pizza - Form Config
- * 
- * FORMS: Create a form at https://formspree.io and replace YOUR_FORM_ID
- * in pages/event-request.html (form action) and index.html (booking modal).
+ *
+ * Get your free Web3Forms access key at https://web3forms.com
+ * Enter max@peacewoodfiredpizza.com and paste the key below.
  */
 var PEACE_PIZZA_CONFIG = {
-  // Your Formspree form ID - e.g. 'xjabc123' from https://formspree.io/f/xjabc123
-  formspreeEndpoint: 'YOUR_FORM_ID'
+  web3formsKey: 'YOUR_WEB3FORMS_KEY'
 };
