@@ -5,5 +5,5 @@
  * Enter max@peacewoodfiredpizza.com and paste the key below.
  */
 var PEACE_PIZZA_CONFIG = {
-  web3formsKey: 'YOUR_WEB3FORMS_KEY'
+  web3formsKey: 'a32abfb1-d1e6-4200-8749-29af52588ed2'
 };
