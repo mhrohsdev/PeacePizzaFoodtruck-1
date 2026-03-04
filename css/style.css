@@ -1081,15 +1081,16 @@ textarea.form-control { min-height: 120px; resize: vertical; }
 
 /* --- MENU PDF --- */
 .menu-inline-viewer {
-  max-width: 720px;
+  max-width: 900px;
   margin: 0 auto;
 }
 .menu-inline-viewer iframe {
   width: 100%;
-  min-height: 400px;
+  min-height: 600px;
+  height: 700px;
 }
 @media (max-width: 768px) {
-  .menu-inline-viewer iframe { height: 420px; }
+  .menu-inline-viewer iframe { height: 500px; min-height: 500px; }
 }
 .menu-page-section { padding: 36px 0 48px; }
 .menu-pdf-wrapper {
@@ -1105,9 +1106,17 @@ textarea.form-control { min-height: 120px; resize: vertical; }
 .menu-pdf-iframe {
   display: block;
   width: 100%;
-  height: min(85vh, 880px);
+  height: min(90vh, 1000px);
+  min-height: 600px;
   border: 0;
   border-radius: var(--radius-md);
+}
+.menu-pdf-fallback {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .menu-pdf-actions {
   display: flex;
@@ -1117,7 +1126,7 @@ textarea.form-control { min-height: 120px; resize: vertical; }
   margin-top: 20px;
 }
 @media (max-width: 768px) {
-  .menu-pdf-iframe { height: 70vh; min-height: 450px; }
+  .menu-pdf-iframe { height: 75vh; min-height: 500px; }
   .menu-pdf-actions { margin-top: 16px; }
 }
 

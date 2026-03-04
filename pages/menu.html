@@ -203,7 +203,11 @@
   <section class="section section-compact menu-pdf-section">
     <div class="container">
       <div class="menu-pdf-wrapper">
-        <iframe src="../menu/Peace-pizza-menu.pdf#view=FitH" class="menu-pdf-iframe" title="Peace Pizza Menu" loading="lazy"></iframe>
+        <iframe src="../menu/Peace-pizza-menu.pdf#view=FitH&zoom=page-fit" class="menu-pdf-iframe" title="Peace Pizza Menu" loading="lazy" allow="fullscreen"></iframe>
+        <div class="menu-pdf-fallback" style="display:none; padding:60px 20px; text-align:center; background:var(--cream); border-radius:var(--radius-md);">
+          <p style="color:var(--gray-mid); margin-bottom:20px;">Having trouble viewing the menu?</p>
+          <a href="../menu/Peace-pizza-menu.pdf" target="_blank" rel="noopener" class="btn btn-primary">Open PDF in New Tab</a>
+        </div>
       </div>
       <div class="menu-pdf-actions">
         <a href="../menu/Peace-pizza-menu.pdf" download="Peace-Pizza-Menu.pdf" class="btn btn-primary">
