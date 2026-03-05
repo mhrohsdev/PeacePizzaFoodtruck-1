@@ -5,7 +5,7 @@ nul
 extracted/
 site/
 site-source/
-menu/
+# menu/ - removed so PDF is included
 download-images.js
 package.json
 package-lock.json
